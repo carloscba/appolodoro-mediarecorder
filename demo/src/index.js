@@ -4,9 +4,14 @@ import {render} from 'react-dom'
 import AppolodoroMediaRecorder from '../../src'
 
 class Demo extends Component {
+
+  handleOnError = (error) =>{
+    console.log(error)
+  }
+
   render() {
     return <div>
-      <AppolodoroMediaRecorder />
+      <AppolodoroMediaRecorder onError = { this.handleOnError } />
     </div>
   }
 }

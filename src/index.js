@@ -15,21 +15,25 @@ class AppolodoroMediaRecorder extends Component {
 
   componentDidMount(){
     
-    navigator.mediaDevices.enumerateDevices()
-    .then((devices)=> {
+    try{
+      navigator.mediaDevices.enumerateDevices().then((devices)=> {
       
-      this.videoDevices = devices.filter((item) => {
-        return item.kind === 'videoinput'
-      }) 
-      
-      if(this.videoDevices.length > 0){
-        this.currentDevice = this.videoDevices[0]
-        this.setStreaming(this.videoDevices[0].deviceId)
+        this.videoDevices = devices.filter((item) => {
+          return item.kind === 'videoinput'
+        }) 
         
-      }
-    }).catch( (error) => {
-      new Error(error)
-    })    
+        if(this.videoDevices.length > 0){
+          this.currentDevice = this.videoDevices[0]
+          this.setStreaming(this.videoDevices[0].deviceId)
+          
+        }
+      }).catch( (error) => {
+        (this.props.onError) && this.props.onError(error)
+      })
+    }catch(error){
+      (this.props.onError) && this.props.onError(error)
+    }
+        
   }
 
   setStreaming = (deviceId) => {
@@ -42,18 +46,24 @@ class AppolodoroMediaRecorder extends Component {
       }
     }
     
-    navigator.mediaDevices.getUserMedia(constraints).then( (MediaStream) => {
-      //Asigno al recorder el streaming
-      this.setRecord(MediaStream)
-
-      //Player de previsualizacion
-      this.videoPlayer.srcObject = MediaStream;
-
-      this.videoPlayer.onloadedmetadata = (event) => {
-        event.target.play()
-      }
-        
-    })
+    try{
+      navigator.mediaDevices.getUserMedia(constraints).then( (MediaStream) => {
+        //Asigno al recorder el streaming
+        this.setRecord(MediaStream)
+  
+        //Player de previsualizacion
+        this.videoPlayer.srcObject = MediaStream;
+  
+        this.videoPlayer.onloadedmetadata = (event) => {
+          event.target.play()
+        }
+      }).catch( (error)=>{
+        (this.props.onError) && this.props.onError(error)
+      })
+    }catch(error){
+      (this.props.onError) && this.props.onError(error)
+    }
+    
   }
 
   stopStreaming = () => {
@@ -134,6 +144,7 @@ class AppolodoroMediaRecorder extends Component {
 
 AppolodoroMediaRecorder.propTypes = {
   onTakePhoto : PropTypes.func,
+  onError : PropTypes.func,
   styles : PropTypes.object
 }
 

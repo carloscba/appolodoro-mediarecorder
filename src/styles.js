@@ -13,12 +13,13 @@ export default {
     },
     btnPhoto : {
         borderRadius : '50%',
+        border: 0,
         color : '#000',
         backgroundColor : '#000',
         padding:'20px',
         display:'block',
         width:'100%',
         maxWidth:30,
-        margin: '0 auto',
+        margin: '10px auto',
     }
 }
