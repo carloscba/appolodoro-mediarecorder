@@ -31,7 +31,7 @@ class AppolodoroMediaRecorder extends Component {
         (this.props.onError) && this.props.onError(error)
       })
     }catch(error){
-      (this.props.onError) && this.props.onError(error)
+      this.props.unavailable(error)
     }
         
   }
@@ -145,6 +145,7 @@ class AppolodoroMediaRecorder extends Component {
 AppolodoroMediaRecorder.propTypes = {
   onTakePhoto : PropTypes.func,
   onError : PropTypes.func,
+  unavailable : PropTypes.func.isRequired,
   styles : PropTypes.object
 }
 

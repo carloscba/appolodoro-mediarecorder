@@ -1,6 +1,6 @@
 {
   "name": "appolodoro-mediarecorder",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "appolodoro-mediarecorder React component",
   "main": "lib/index.js",
   "module": "es/index.js",
