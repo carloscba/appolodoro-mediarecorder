@@ -23,15 +23,22 @@ class Demo extends Component {
     })
   }
 
+  handleTakePhoto = (imageData) => {
+    this.setState({
+      imageData
+    })
+  }
+
   render() {
     return <div>
       {(this.state.show)&&
         <AppolodoroMediaRecorder 
         onError = { this.handleOnError } 
+        onTakePhoto = { this.handleTakePhoto } 
         unavailable = { this.handleUnavailable }
         />
       }
-
+      <img src={ this.state.imageData } />
     </div>
   }
 }

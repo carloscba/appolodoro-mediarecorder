@@ -106,9 +106,8 @@ class AppolodoroMediaRecorder extends Component {
 
     context.drawImage(this.videoPlayer, 0, 0, canvas.width, canvas.height);    
     
-    canvas.toBlob( (response) => {
-      (this.props.onTakePhoto) && this.props.onTakePhoto(response)
-    })
+    (this.props.onTakePhoto) && this.props.onTakePhoto(canvas.toDataURL("image/jpeg", 1))
+    
     this.stopStreaming()
   }
 
