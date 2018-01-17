@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import VideoPlayer from './VideoPlayer'
 import PropTypes from 'prop-types';
-import styles from './styles'
 
 class AppolodoroMediaRecorder extends Component {
   
