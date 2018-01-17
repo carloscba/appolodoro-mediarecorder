@@ -133,7 +133,6 @@ class AppolodoroMediaRecorder extends Component {
         startRecord={ this.handleStartRecord } 
         stopRecord={ this.handleStopRecord }  
         takePhoto = { this.handleTakePhoto }
-        styles = { this.props.styles }
       />
     );
   }
@@ -144,10 +143,9 @@ AppolodoroMediaRecorder.propTypes = {
   onTakePhoto : PropTypes.func,
   onError : PropTypes.func,
   unavailable : PropTypes.func.isRequired,
-  styles : PropTypes.object
 }
 
 AppolodoroMediaRecorder.defaultProps = {
-  styles : styles
+  
 }
 export default AppolodoroMediaRecorder;
