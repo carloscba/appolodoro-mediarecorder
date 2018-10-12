@@ -7,6 +7,7 @@ class AppolodoroMediaRecorder extends Component {
   videoDevices = null
   currentDevice = null
   recorder = null
+  URL = window.URL || window.webkitURL;
 
   constructor(props) {
     super(props)
@@ -16,14 +17,22 @@ class AppolodoroMediaRecorder extends Component {
   }
 
   componentDidMount() {
+    this.enumerateDevices()
+  }
 
+  componentDidCatch = (error) => {
+    alert(error)
+  }
+
+  /**
+   * List media devices and detect video input.
+   */
+  enumerateDevices = () => {
     try {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
-
         this.videoDevices = devices.filter((item) => {
           return item.kind === 'videoinput'
         })
-
         if (this.videoDevices.length > 0) {
           this.currentDevice = this.videoDevices[0]
           this.setStreaming(this.videoDevices[0].deviceId)
@@ -35,37 +44,47 @@ class AppolodoroMediaRecorder extends Component {
     } catch (error) {
       this.props.unavailable(error)
     }
-
   }
 
-  componentDidCatch = (error) => {
-    alert(error)
-  }
-
+  /** 
+   * Set streaming properties with video device saved
+  */
   setStreaming = (deviceId) => {
-    const constraints = {
-      audio: {
-        sampleRate: 48000,
-        channelCount: 2,
-        volume: 1.0
-      },
-      video: {
-        width: 640,
-        height: 480,
-        deviceId: deviceId
-      }
+
+    const audioSettings = {
+      sampleRate: 48000,
+      channelCount: 2,
+      volume: 1.0
     }
 
+    const videoSettings = {
+      width: 640,
+      height: 480,
+      deviceId: deviceId
+    }
+
+    const constraints = {
+      audio: audioSettings,
+      video: videoSettings
+    }
+    this.playStreaming(constraints)
+  }
+
+  /**
+   * Attach streaming from video device to video player and start
+   * state.current to STREAMING
+   */
+  playStreaming = (constraints) => {
     try {
       navigator.mediaDevices.getUserMedia(constraints).then((MediaStream) => {
-        //Genero un recorder usando el streaming
         this.setRecord(MediaStream)
-        //Asigo el streaming como fuente para el player de video
         this.videoPlayer.srcObject = MediaStream;
-        //Activo la previsualizacion de la camara en el player
         this.videoPlayer.onloadedmetadata = (event) => {
           try {
             event.target.play()
+            this.setState({
+              current : 'STREAMING'
+            })
           } catch (error) {
             (this.props.onError) && this.props.onError(error)
           }
@@ -73,18 +92,22 @@ class AppolodoroMediaRecorder extends Component {
       }).catch((error) => {
         (this.props.onError) && this.props.onError(error)
       })
-    } catch (error) {
+    } catch(error) {
       (this.props.onError) && this.props.onError(error)
     }
-
   }
 
   stopStreaming = () => {
-    //Detengo el streaming de todas las fuentes en el video player
-    const tracks = this.videoPlayer.srcObject.getTracks();
-    tracks.forEach(function (track) {
-      track.stop();
-    });
+    if (this.videoPlayer.srcObject) {
+      const tracks = this.videoPlayer.srcObject.getTracks();
+      tracks.forEach(function (track) {
+        track.stop();
+      });
+      this.videoPlayer.srcObject = null
+      this.setState({
+        current : 'STOPSTREAMING'
+      })
+    }
   }
 
   setRecord = (MediaStream) => {
@@ -97,18 +120,32 @@ class AppolodoroMediaRecorder extends Component {
     this.recorder.onstart = (event) => {
       console.log('onstart')
     }
-    
+
     this.recorder.onstop = (event) => {
       this.stopStreaming()
     }
 
     this.recorder.ondataavailable = (event) => {
-      console.log('event.data', event.data)
-      this.videoPlayer.src = window.URL.createObjectURL(event.data)
-      this.videoPlayer.onloadedmetadata = (event) => {
-        console.log('event', event)
-        this.videoPlayer.play()
+      try{
+        const capturedVideo = this.URL.createObjectURL(event.data)
+
+        this.videoPlayer.src = capturedVideo
+        this.videoPlayer.load();
+        
+        this.setState({
+          current : 'LOADING_VIDEO'
+        })
+  
+        this.videoPlayer.onloadedmetadata = (event) => {
+          this.setState({
+            current : 'PLAYING_VIDEO'
+          })        
+          this.videoPlayer.play()
+        }
+      }catch(error){
+        console.log(error)
       }
+      
     }
 
   }
@@ -150,13 +187,13 @@ class AppolodoroMediaRecorder extends Component {
 
   audioPlayerHandler = (element) => {
     this.audioPlayer = element
-  }  
+  }
 
   render() {
     return (
       <VideoPlayer
-        setVideoPlayer ={this.videoPlayerHandler}
-        setAudioPlayer ={this.audioPlayerHandler}
+        setVideoPlayer={this.videoPlayerHandler}
+        setAudioPlayer={this.audioPlayerHandler}
         startRecord={this.handleStartRecord}
         stopRecord={this.handleStopRecord}
         takePhoto={this.handleTakePhoto}
@@ -168,7 +205,7 @@ class AppolodoroMediaRecorder extends Component {
 
 AppolodoroMediaRecorder.propTypes = {
   onTakePhoto: PropTypes.func,
-  onError: PropTypes.func,
+  onError: PropTypes.func.isRequired,
   unavailable: PropTypes.func.isRequired,
 }
 
