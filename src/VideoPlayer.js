@@ -4,8 +4,12 @@ const VideoPlayer = (props) => {
         
     return (
         <div className='VideoPlayer'>
-            <video className='VideoPlayer__video' ref={ props.setRef }></video>
-            <button className='VideoPlayer__btnPhoto' onClick={ props.takePhoto }></button>
+            
+            <video controls className='VideoPlayer__video' width="320" height="240" ref={ props.setVideoPlayer }></video>
+
+            <button className='VideoPlayer__btnStart' onClick={ props.startRecord }>Start Record</button>
+            <button className='VideoPlayer__btnStop' onClick={ props.stopRecord }>Stop Record</button>
+            <button className='VideoPlayer__btnPhoto' onClick={ props.takePhoto }>Photo</button>
         </div>
     )
 }

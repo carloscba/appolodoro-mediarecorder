@@ -1,25 +1,30 @@
-import React, {Component} from 'react'
-import {render} from 'react-dom'
+import React, { Component } from 'react'
+import { render } from 'react-dom'
 
 import AppolodoroMediaRecorder from '../../src'
 
 class Demo extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props)
 
     this.state = {
-      show : true
+      show: true,
+      error: 'Lorem Ipsum'
     }
   }
 
-  handleOnError = (error) =>{
+  handleOnError = (error) => {
     console.log(error)
+    this.setState({
+      error: error
+    })
   }
 
   handleUnavailable = (error) => {
     this.setState({
-      show : false
+      show: true,
+      error: error
     })
   }
 
@@ -31,16 +36,16 @@ class Demo extends Component {
 
   render() {
     return <div>
-      {(this.state.show)&&
-        <AppolodoroMediaRecorder 
-        onError = { this.handleOnError } 
-        onTakePhoto = { this.handleTakePhoto } 
-        unavailable = { this.handleUnavailable }
+      {(this.state.show) &&
+        <AppolodoroMediaRecorder
+          onError={this.handleOnError}
+          onTakePhoto={this.handleTakePhoto}
+          unavailable={this.handleUnavailable}
         />
       }
-      <img src={ this.state.imageData } />
+      <img src={this.state.imageData} />
     </div>
   }
 }
 
-render(<Demo/>, document.querySelector('#demo'))
+render(<Demo />, document.querySelector('#demo'))
